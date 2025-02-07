@@ -1,7 +1,6 @@
 networks:
   laravel:
 
-
 services:
   app:
     image: docker-compose-laravel-app
@@ -37,7 +36,7 @@ services:
     networks:
       - laravel
     volumes:
-          - ./mysql:/var/lib/mysql
+      - ./mysql:/var/lib/mysql
 
   php:
     build:
@@ -53,24 +52,9 @@ services:
     networks:
       - laravel
 
-  composer:
-    build:
-      context: ./dockerfiles
-      dockerfile: php.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-    volumes:
-      - ./src:/var/www/html
-    depends_on:
-      - php
-    entrypoint: [ 'composer', '--ignore-platform-reqs' ]
-    networks:
-      - laravel
-
   npm:
     image: node:current-alpine
-    container_name: twitter-clone-npm-1
+    container_name: twitter-clone-npm
     volumes:
       - ./src:/var/www/html
     ports:
@@ -79,20 +63,5 @@ services:
       - "5173:5173"
     working_dir: /var/www/html
     command: sh -c "npm install && npm run dev"
-    networks:
-      - laravel
-
-  artisan:
-    build:
-      context: ./dockerfiles
-      dockerfile: php.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-    volumes:
-      - ./src:/var/www/html:delegated
-    depends_on:
-      - mysql
-    entrypoint: [ 'php', '/var/www/html/artisan' ]
     networks:
       - laravel
